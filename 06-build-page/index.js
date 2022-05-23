@@ -2,57 +2,57 @@ const path = require('path');
 const fs = require('fs');
 const { mkdir, readdir, access, copyFile, rm, appendFile } = require('fs/promises');
 
-const destPath = path.join(__dirname, 'project-dist');
-const componentsPath = path.join(__dirname, 'components');
-const templatePath = path.join(__dirname, 'template.html');
-const assetsPath = path.join(__dirname, 'assets');
-const destAssetsPath = path.join(destPath, 'assets');
-const stylesPath = path.join(__dirname, 'styles');
-const destStylesPath = path.join(path.join(destPath, 'style.css'));
-const mp = {};
+let destPath = path.join(__dirname, 'project-dist');
+let componentsPath = path.join(__dirname, 'components');
+let templatePath = path.join(__dirname, 'template.html');
+let assetsPath = path.join(__dirname, 'assets');
+let destAssetsPath = path.join(destPath, 'assets');
+let stylesPath = path.join(__dirname, 'styles');
+let destStylesPath = path.join(path.join(destPath, 'style.css'));
+let mp = {};
 
-const readComponents = async function() {
-    const files = await readdir(componentsPath, {withFileTypes: true});
-    for (const file of files) {
+let readComponents = async function() {
+    let files = await readdir(componentsPath, {withFileTypes: true});
+    for (let file of files) {
       if (file.isFile() && path.extname(file.name) === '.html') {
-        const input = await fs.createReadStream(path.join(componentsPath, file.name), 'utf-8');
+        let input = await fs.createReadStream(path.join(componentsPath, file.name), 'utf-8');
         input.on('data', (chunk) => {
-          const key = `{{${ path.parse(file.name).name }}}`;
+          let key = `{{${ path.parse(file.name).name }}}`;
           mp[key] = mp[key] ? mp[key] += chunk : chunk;
         });
       }
     }
 };
 
-const buildHTML = async function() {
+let buildHTML = async function() {
   await readComponents();
   let result = '';
-  const input = await fs.createReadStream(templatePath, 'utf-8');
+  let input = await fs.createReadStream(templatePath, 'utf-8');
   input.on('data', (chunk) => result += chunk);
   input.on('error', (err) => console.error(err));
   input.on('end', () => {
-    for (const key in mp) {
+    for (let key in mp) {
       result = result.split(key).join(mp[key]);
     }
-    const output = fs.createWriteStream(path.join(destPath, 'index.html'));
+    let output = fs.createWriteStream(path.join(destPath, 'index.html'));
     output.write(result);
   });
 };
 
-const mergeOfStyles = async function() {
+let mergeOfStyles = async function() {
   fs.createWriteStream(destStylesPath);
-    const files = await readdir(stylesPath, {withFileTypes: true});
-    for (const file of files) {
+    let files = await readdir(stylesPath, {withFileTypes: true});
+    for (let file of files) {
       if (file.isFile() && path.extname(file.name) === '.css') {
-        const input = await fs.createReadStream(path.join(stylesPath, file.name), 'utf-8');
+        let input = await fs.createReadStream(path.join(stylesPath, file.name), 'utf-8');
         input.on('data', (chunk) => appendFile(destStylesPath, chunk));
       }
     }
 };
 
-const copyFiles = async function (srcPath, destPath) {
-    const dir = await readdir(srcPath, {withFileTypes: true});
-    for (const item of dir) {
+let copyFiles = async function (srcPath, destPath) {
+    let dir = await readdir(srcPath, {withFileTypes: true});
+    for (let item of dir) {
       if (item.isFile()) {
         await copyFile(path.join(srcPath, item.name), path.join(destPath, item.name));
       } else {
@@ -62,7 +62,7 @@ const copyFiles = async function (srcPath, destPath) {
     }
 };
 
-const copyAssets = async function() {
+let copyAssets = async function() {
   try {
     await access(destAssetsPath);
     await rm(destAssetsPath, { recursive: true, force: true });
