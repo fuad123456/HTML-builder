@@ -31,7 +31,7 @@ fs.promises.readdir(path.join(__dirname,'files-copy'),{withFileTypes: true})
 				fs.access(path.join(__dirname,'files',file.name),fs.constants.F_OK,(err)=>{
 					if(err){
 						fs.unlink( path.join(__dirname,'files-copy',file.name) , err => {
-							if(err) throw err; // не удалось удалить файл
+							if(err) throw err;
 							console.log('Файл успешно удалён');
 						 });
 					}
