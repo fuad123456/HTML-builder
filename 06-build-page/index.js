@@ -12,7 +12,6 @@ const destStylesPath = path.join(path.join(destPath, 'style.css'));
 const mp = {};
 
 const readComponents = async function() {
-  try {
     const files = await readdir(componentsPath, {withFileTypes: true});
     for (const file of files) {
       if (file.isFile() && path.extname(file.name) === '.html') {
@@ -23,9 +22,6 @@ const readComponents = async function() {
         });
       }
     }
-  } catch (err) {
-    console.error(err);
-  }
 };
 
 const buildHTML = async function() {
@@ -45,7 +41,6 @@ const buildHTML = async function() {
 
 const mergeOfStyles = async function() {
   fs.createWriteStream(destStylesPath);
-  try {
     const files = await readdir(stylesPath, {withFileTypes: true});
     for (const file of files) {
       if (file.isFile() && path.extname(file.name) === '.css') {
@@ -53,13 +48,9 @@ const mergeOfStyles = async function() {
         input.on('data', (chunk) => appendFile(destStylesPath, chunk));
       }
     }
-  } catch (err) {
-    console.error(err);
-  }
 };
 
 const copyFiles = async function (srcPath, destPath) {
-  try {
     const dir = await readdir(srcPath, {withFileTypes: true});
     for (const item of dir) {
       if (item.isFile()) {
@@ -69,9 +60,6 @@ const copyFiles = async function (srcPath, destPath) {
         copyFiles(path.join(srcPath, item.name), path.join(destPath, item.name));
       }
     }
-  } catch (err) {
-    console.error( err);
-  }
 };
 
 const copyAssets = async function() {
@@ -87,12 +75,8 @@ const copyAssets = async function() {
 };
 
 (async function() {
-  try {
     await mkdir(destPath, { recursive: true });
     buildHTML();
     mergeOfStyles();
     copyAssets();
-  } catch (err) {
-    console.error( err);
-  }
 })();
